@@ -4,9 +4,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { Eye, EyeOff } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-import { loginUser } from "../api/auth";
+import { loginUser } from "../../services/auth";
 import { toast } from "sonner";
-import useAuth from "../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
@@ -47,7 +47,7 @@ const Login = () => {
           accessToken: data?.data[0]?.token,
           refreshToken: data?.data[0]?.refreshToken,
         });
-
+        localStorage.setItem("uid", data?.data[0]?.userId);
         Cookies.set("accessToken", data?.data[0]?.token, {
           expires: 20 / 1440,
         });

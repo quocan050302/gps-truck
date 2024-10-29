@@ -1,14 +1,9 @@
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthContext from "../context/AuthProvider";
+import useAuth from "./useAuth";
 
 const useAuthRedirect = () => {
-  const context = useContext(AuthContext);
-
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  const { auth } = context;
+  const { auth } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {

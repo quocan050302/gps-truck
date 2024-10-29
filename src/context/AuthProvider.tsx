@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (auth?.accessToken) {
-      Cookies.set("accessToken", auth.accessToken, { expires: 1 });
+      Cookies.set("accessToken", auth.accessToken);
     } else {
       Cookies.remove("accessToken");
     }

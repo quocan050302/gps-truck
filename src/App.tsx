@@ -1,24 +1,39 @@
-// import { useState } from "react";
+import "antd/dist/reset.css";
+
 import { Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import "./App.css";
-import Login from "./components/Login";
+import Login from "./pages/Auth/Login";
 import Home from "./pages/Home";
-// import useAuth from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
+import VehicleRoad from "./pages/VehicleRoad";
+import MainLayout from "./components/MainLayout";
 
 function App() {
-  // const [count, setCount] = useState(0);
-  
   return (
     <>
+      <ToastContainer />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
           path="/"
           element={
             <ProtectedRoute>
-              <Home />
+              <MainLayout>
+                <Home />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/vehicle-road"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <VehicleRoad />
+              </MainLayout>
             </ProtectedRoute>
           }
         />
