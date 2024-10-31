@@ -3,8 +3,11 @@ import DateTimePicker from "../components/ui/DateTimePicker";
 import Select from "../components/ui/Select";
 import { Button, Spin } from "antd";
 import { fetchVehicleRoute } from "../services/routeVehicle";
-import { MapContainer, Polyline, TileLayer } from "react-leaflet";
+import { MapContainer, Marker, Polyline, TileLayer } from "react-leaflet";
 import { LatLngTuple, Map } from "leaflet";
+import arrowIcon from "../assets/a-down.png";
+import L from "leaflet";
+import "leaflet-rotatedmarker";
 
 interface DateRange {
   startDate: number | null;
@@ -36,11 +39,11 @@ const VehicleRoad = () => {
           dateRange.endDate,
           Number(userId)
         );
-        console.log("Vehicle Route Data:", data?.data?.route);
         setPositionRoute(data?.data?.route);
-        if (positions.length > 0) {
-          const latitudes = positions.map((pos) => pos[0]);
-          const longitudes = positions.map((pos) => pos[1]);
+        const locationRoad: IVehicle[] = data?.data?.route;
+        if (locationRoad.length > 0) {
+          const latitudes = locationRoad.map((pos) => pos.latitude);
+          const longitudes = locationRoad.map((pos) => pos.longitude);
 
           const centerLat =
             latitudes.reduce((sum, lat) => sum + lat, 0) / latitudes.length;
@@ -50,7 +53,7 @@ const VehicleRoad = () => {
           const center: [number, number] = [centerLat, centerLng];
 
           if (mapRef.current) {
-            mapRef.current.setView(center, 13);
+            mapRef.current.setView(center, 30);
           }
         } else {
           console.error("Unexpected data structure:", data);
@@ -64,11 +67,23 @@ const VehicleRoad = () => {
       console.error("Please select a vehicle and a valid date range.");
     }
   };
+
   const positions: LatLngTuple[] = Array.isArray(positionRoute)
     ? positionRoute.map(
         (point: IvehicleRoute): LatLngTuple => [point.latitude, point.longitude]
       )
     : [];
+
+  const createArrowIcon = (rotation: number) => {
+    return new L.Icon({
+      iconUrl: arrowIcon,
+      iconSize: [12, 12],
+      className: "custom-arrow-icon",
+      html: `<div style="transform: rotate(${rotation}deg); display: flex; justify-content: center; align-items: center;">
+             <img src="${arrowIcon}" style="width: 12px; height: 12px;" />
+           </div>`,
+    });
+  };
 
   return (
     <div>
@@ -102,6 +117,19 @@ const VehicleRoad = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <Polyline color="blue" weight={5} opacity={0.7} positions={positions} />
+        {positionRoute.length > 0
+          ? positionRoute
+              .filter((_, index) => index % 5 === 0)
+              .map((point: IVehicle, index) => (
+                <Marker
+                  key={index}
+                  position={[point.latitude, point.longitude]}
+                  icon={createArrowIcon(point.rotation)}
+                  rotationAngle={point.rotation}
+                  rotationOrigin="center"
+                ></Marker>
+              ))
+          : []}
       </MapContainer>
     </div>
   );

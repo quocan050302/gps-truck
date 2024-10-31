@@ -1,21 +1,22 @@
-import { Marker, Popup } from "react-leaflet";
+import { Marker } from "react-leaflet";
 import L from "leaflet";
 import ReactDOMServer from "react-dom/server";
 import Truck from "./Truck";
 import Car from "./Car";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import VehicleRefresher from "./VehicleRefresher";
+import { selectVehicle } from "../redux/features/vehicle/filterSlice";
+import "leaflet-rotatedmarker";
 
 const VehicleList = () => {
   const { list } = useSelector((state: RootState) => state.vehicles);
-
+  const dispatch = useDispatch();
   return (
     <>
       <VehicleRefresher />
 
       {list.map((vehicle) => {
-        // console.log("vehicle.vehicle_name", vehicle.vehicle_name);
         const isRunning = vehicle.status === 3;
         const color = isRunning ? "green" : "black";
         return (
@@ -33,19 +34,15 @@ const VehicleList = () => {
                 )
               ),
             })}
-          >
-            <Popup>
-              <strong>{vehicle.vehicle_name}</strong>
-              <br />
-              Speed: {vehicle.speed} km/h
-              <br />
-              Status: {isRunning ? "Running" : "Stopped"}
-              <br />
-              Driver: {vehicle.name_driver}
-              <br />
-              Phone: {vehicle.phone_driver}
-            </Popup>
-          </Marker>
+            // rotationAngle={vehicle.rotation}
+            // rotationOrigin="center"
+
+            eventHandlers={{
+              click: () => {
+                dispatch(selectVehicle(vehicle));
+              },
+            }}
+          ></Marker>
         );
       })}
     </>

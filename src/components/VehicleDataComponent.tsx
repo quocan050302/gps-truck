@@ -2,6 +2,9 @@ import { MapContainer, TileLayer } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import VehicleList from "./VehicleList";
+import Statistic from "./Statistic";
+import ModalDetailCar from "./ModalDetailCar";
+import { useRef } from "react";
 
 const VehicleDataComponent = () => {
   L.Icon.Default.mergeOptions({
@@ -11,9 +14,12 @@ const VehicleDataComponent = () => {
     shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
   });
 
+  const mapRef = useRef<L.Map | null>(null);
+  const modalRef = useRef(null);
   return (
     <div>
       <MapContainer
+        ref={mapRef}
         center={[10.779616, 106.683792]}
         zoom={13}
         style={{ height: "100vh", width: "100%" }}
@@ -24,6 +30,8 @@ const VehicleDataComponent = () => {
         />
         <VehicleList />
       </MapContainer>
+      <Statistic mapRef={mapRef} ref={modalRef}></Statistic>
+      <ModalDetailCar ref={modalRef}></ModalDetailCar>
     </div>
   );
 };

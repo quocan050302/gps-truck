@@ -18,7 +18,6 @@ const VehicleRefresher = () => {
 
     const intervalId = setInterval(() => {
       fetchData();
-      //   setIsAlertVisible(true);
     }, 10000);
 
     const countdownInterval = setInterval(() => {
@@ -26,7 +25,6 @@ const VehicleRefresher = () => {
         if (prev > 1) {
           return prev - 1;
         } else {
-          //   setIsAlertVisible(false);
           return 10;
         }
       });

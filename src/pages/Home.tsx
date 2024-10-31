@@ -2,7 +2,7 @@ import VehicleDataComponent from "../components/VehicleDataComponent";
 
 const Home = () => {
   return (
-    <div>
+    <div className="relative overflow-hidden">
       <VehicleDataComponent></VehicleDataComponent>
     </div>
   );
