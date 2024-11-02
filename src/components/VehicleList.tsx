@@ -8,8 +8,14 @@ import { RootState } from "../redux/store";
 import VehicleRefresher from "./VehicleRefresher";
 import { selectVehicle } from "../redux/features/vehicle/filterSlice";
 import "leaflet-rotatedmarker";
+import { forwardRef } from "react";
 
-const VehicleList = () => {
+type ModalRef = {
+  open: () => void;
+  close: () => void;
+};
+
+const VehicleList = forwardRef<ModalRef>((_, ref) => {
   const { list } = useSelector((state: RootState) => state.vehicles);
   const dispatch = useDispatch();
   return (
@@ -34,11 +40,11 @@ const VehicleList = () => {
                 )
               ),
             })}
-            // rotationAngle={vehicle.rotation}
-            // rotationOrigin="center"
-
             eventHandlers={{
               click: () => {
+                if (ref && "current" in ref && ref.current) {
+                  ref.current.open();
+                }
                 dispatch(selectVehicle(vehicle));
               },
             }}
@@ -47,6 +53,6 @@ const VehicleList = () => {
       })}
     </>
   );
-};
+});
 
 export default VehicleList;

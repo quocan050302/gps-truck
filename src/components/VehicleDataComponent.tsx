@@ -23,12 +23,13 @@ const VehicleDataComponent = () => {
         center={[10.779616, 106.683792]}
         zoom={13}
         style={{ height: "100vh", width: "100%" }}
+        zoomControl={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <VehicleList />
+        <VehicleList ref={modalRef} />
       </MapContainer>
       <Statistic mapRef={mapRef} ref={modalRef}></Statistic>
       <ModalDetailCar ref={modalRef}></ModalDetailCar>

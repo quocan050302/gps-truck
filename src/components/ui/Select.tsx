@@ -1,8 +1,5 @@
 import { Select as AntdSelect } from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
-import { useEffect, useState } from "react";
-import { fetchVehicleData } from "../../redux/api/vehicleThunks";
+import { useState, useEffect } from "react";
 
 interface OptionType {
   value: string | undefined;
@@ -10,40 +7,45 @@ interface OptionType {
 }
 
 interface SelectProps {
+  options: OptionType[];
   onChange: (value: string) => void;
+  placeholder?: string;
+  defaultValue?: string;
+  enableFiltering?: boolean;
 }
 
-const Select = ({ onChange }: SelectProps) => {
-  const { list } = useSelector((state: RootState) => state.vehicles);
-  const dispatch = useDispatch();
-
-  const [filteredOptions, setFilteredOptions] = useState<OptionType[]>([]);
+const Select = ({
+  options,
+  onChange,
+  placeholder = "Select an option",
+  defaultValue,
+  enableFiltering = true,
+}: SelectProps) => {
+  const [filteredOptions, setFilteredOptions] = useState<OptionType[]>(options);
 
   useEffect(() => {
-    dispatch(fetchVehicleData());
-  }, [dispatch]);
-
-  const options = list.map((item) => ({
-    value: item.imei,
-    label: `${item.vehicle_name} - ${item.imei}`,
-  }));
+    setFilteredOptions(options);
+  }, [options]);
 
   const onSearch = (searchText: string) => {
-    const filtered = options.filter(({ label }) =>
-      label.toLowerCase().includes(searchText.toLowerCase())
-    );
-    setFilteredOptions(filtered);
+    if (enableFiltering) {
+      const filtered = options.filter(({ label }) =>
+        label.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setFilteredOptions(filtered);
+    }
   };
 
   return (
     <AntdSelect
-      showSearch
-      placeholder="Select a vehicle"
+      showSearch={enableFiltering}
+      placeholder={placeholder}
+      defaultValue={defaultValue}
       optionFilterProp="label"
       onChange={onChange}
       onSearch={onSearch}
       className="w-full"
-      options={filteredOptions.length > 0 ? filteredOptions : options}
+      options={filteredOptions}
     />
   );
 };

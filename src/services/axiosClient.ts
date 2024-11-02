@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
 
 const BASE_URL = "https://sys01.midvietnam.net/api/v1";
@@ -6,6 +6,17 @@ const BASE_URL = "https://sys01.midvietnam.net/api/v1";
 const api = axios.create({
   baseURL: BASE_URL,
 });
+
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+function onRefreshed(token: string) {
+  refreshSubscribers.forEach((callback) => callback(token));
+  refreshSubscribers = [];
+}
+function addRefreshSubscriber(callback: (token: string) => void) {
+  refreshSubscribers.push(callback);
+}
 
 api.interceptors.request.use((config) => {
   const accessToken = Cookies.get("accessToken");
@@ -17,32 +28,50 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => {
-    console.log(response);
     return response;
   },
   async (error) => {
-    const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
+    const originalRequest = error.config as AxiosRequestConfig & {
+      _retry?: boolean;
+    };
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (!isRefreshing) {
+        isRefreshing = true;
         const refreshToken = Cookies.get("refreshToken");
-        const { data } = await api.post("/users/refresh-token", {
-          refresh_token: refreshToken,
-        });
 
-        Cookies.set("accessToken", data?.data[0].token);
+        try {
+          const { data } = await api.post<{ data: { token: string }[] }>(
+            "/users/refresh-token",
+            {
+              refresh_token: refreshToken,
+            }
+          );
 
-        originalRequest.headers[
-          "Authorization"
-        ] = `Bearer ${data?.data[0].token}`;
-        return api(originalRequest);
-      } catch (error) {
-        Cookies.remove("accessToken");
-        Cookies.remove("refreshToken");
-        window.location.href = "/login";
-        return Promise.reject(error);
+          const newToken = data?.data[0].token;
+          Cookies.set("accessToken", newToken);
+          isRefreshing = false;
+          onRefreshed(newToken);
+        } catch (refreshError) {
+          isRefreshing = false;
+          Cookies.remove("accessToken");
+          Cookies.remove("refreshToken");
+          window.location.href = "/login";
+          return Promise.reject(refreshError);
+        }
       }
+
+      return new Promise((resolve) => {
+        addRefreshSubscriber((token: string) => {
+          originalRequest._retry = true;
+          if (originalRequest.headers) {
+            originalRequest.headers["Authorization"] = `Bearer ${token}`;
+          }
+          resolve(api(originalRequest));
+        });
+      });
     }
+
     return Promise.reject(error);
   }
 );

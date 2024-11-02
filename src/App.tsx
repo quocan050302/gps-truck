@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
 import VehicleRoad from "./pages/VehicleRoad";
 import MainLayout from "./components/MainLayout";
+import { CurrentIndexProvider } from "./context/CurrentIndexProvider";
 
 function App() {
   return (
@@ -31,9 +32,11 @@ function App() {
           path="/vehicle-road"
           element={
             <ProtectedRoute>
-              <MainLayout>
-                <VehicleRoad />
-              </MainLayout>
+              <CurrentIndexProvider>
+                <MainLayout>
+                  <VehicleRoad />
+                </MainLayout>
+              </CurrentIndexProvider>
             </ProtectedRoute>
           }
         />

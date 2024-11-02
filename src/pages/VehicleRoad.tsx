@@ -1,6 +1,5 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import DateTimePicker from "../components/ui/DateTimePicker";
-import Select from "../components/ui/Select";
 import { Button, Spin } from "antd";
 import { fetchVehicleRoute } from "../services/routeVehicle";
 import { MapContainer, Marker, Polyline, TileLayer } from "react-leaflet";
@@ -8,6 +7,8 @@ import { LatLngTuple, Map } from "leaflet";
 import arrowIcon from "../assets/a-down.png";
 import L from "leaflet";
 import "leaflet-rotatedmarker";
+import VehicleSelect from "../components/VehicleSelect";
+import PopupHandler from "../components/PopupHandler";
 
 interface DateRange {
   startDate: number | null;
@@ -23,8 +24,12 @@ const VehicleRoad = () => {
   const [positionRoute, setPositionRoute] = useState([]);
   const mapRef = useRef<Map | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [popupInfo, setPopupInfo] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
 
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     const userId = localStorage.getItem("uid");
     if (!userId) {
       console.error("User ID not found. Please log in.");
@@ -53,7 +58,7 @@ const VehicleRoad = () => {
           const center: [number, number] = [centerLat, centerLng];
 
           if (mapRef.current) {
-            mapRef.current.setView(center, 30);
+            mapRef.current.setView(center, 13);
           }
         } else {
           console.error("Unexpected data structure:", data);
@@ -66,7 +71,7 @@ const VehicleRoad = () => {
     } else {
       console.error("Please select a vehicle and a valid date range.");
     }
-  };
+  }, [selectedVehicle, dateRange]);
 
   const positions: LatLngTuple[] = Array.isArray(positionRoute)
     ? positionRoute.map(
@@ -85,12 +90,19 @@ const VehicleRoad = () => {
     });
   };
 
+  const handlePolylineClick = (event: L.LeafletEvent) => {
+    const { lat, lng } = (event as L.LeafletMouseEvent).latlng;
+    setPopupInfo({ lat, lng });
+  };
+
   return (
     <div>
       <div className="flex items-center justify-center gap-8 pt-4 mb-4">
         <div className="flex items-center gap-4 w-[calc((3/12)*100%)]">
           <span className="font-medium text-sm flex-shrink-0">Biển số: </span>
-          <Select onChange={(value: string) => setSelectedVehicle(value)} />
+          <VehicleSelect
+            onChange={(value: string) => setSelectedVehicle(value)}
+          />
         </div>
         <div className="flex items-center gap-4">
           <span className="font-medium text-sm">Thời gian: </span>
@@ -111,12 +123,19 @@ const VehicleRoad = () => {
         zoom={13}
         style={{ height: "100vh", width: "100%" }}
         ref={mapRef}
+        zoomControl={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <Polyline color="blue" weight={5} opacity={0.7} positions={positions} />
+        <Polyline
+          color="blue"
+          weight={5}
+          opacity={0.7}
+          positions={positions}
+          eventHandlers={{ click: handlePolylineClick }}
+        />
         {positionRoute.length > 0
           ? positionRoute
               .filter((_, index) => index % 5 === 0)
@@ -127,9 +146,10 @@ const VehicleRoad = () => {
                   icon={createArrowIcon(point.rotation)}
                   rotationAngle={point.rotation}
                   rotationOrigin="center"
-                ></Marker>
+                />
               ))
           : []}
+        <PopupHandler popupInfo={popupInfo} positionRoute={positionRoute} />
       </MapContainer>
     </div>
   );

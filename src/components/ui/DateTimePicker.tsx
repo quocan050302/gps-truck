@@ -22,8 +22,6 @@ const DateTimePicker = ({ onDateRangeChange }: DateTimePickerProps) => {
     if (value && value[0] && value[1]) {
       const startDate = value[0].unix();
       const endDate = value[1].unix();
-      console.log("Start Date (Unix): ", startDate);
-      console.log("End Date (Unix): ", endDate);
       onDateRangeChange({ startDate, endDate });
       setSelectedDates(value);
     }
@@ -31,12 +29,10 @@ const DateTimePicker = ({ onDateRangeChange }: DateTimePickerProps) => {
 
   const handleChange = (dates: [Dayjs | null, Dayjs | null]) => {
     setSelectedDates(dates);
-    console.log("dates", dates);
     if (dates && dates[0] && dates[1]) {
       const startDate = dates[0].unix();
       const endDate = dates[1].unix();
-      console.log("Start Date (Unix): ", startDate);
-      console.log("End Date (Unix): ", endDate);
+
       onDateRangeChange({ startDate, endDate });
     }
   };

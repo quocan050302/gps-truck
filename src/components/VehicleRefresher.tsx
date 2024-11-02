@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../redux/store";
+import { AppDispatch, RootState } from "../redux/store";
 import { fetchVehicleData } from "../redux/api/vehicleThunks";
 
 const VehicleRefresher = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [countdown, setCountdown] = useState<number>(10);
   const { isLoading } = useSelector((state: RootState) => state.vehicles);
 

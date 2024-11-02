@@ -6,9 +6,10 @@ import { Eye, EyeOff } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { loginUser } from "../../services/auth";
 import { toast } from "sonner";
-import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import useAppContexts from "../../hooks/useAppContexts";
+import AuthContext from "../../context/AuthProvider";
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required("Username is required"),
@@ -22,7 +23,7 @@ type AccountProp = {
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { setAuth } = useAuth();
+  const { setAuth } = useAppContexts(AuthContext);
   const navigate = useNavigate();
   const {
     register,

@@ -1,4 +1,3 @@
-// hooks/useGetAddress.ts
 import { useEffect, useState } from "react";
 import { fetchAddress } from "../services/address";
 

@@ -9,23 +9,13 @@ const DetailRoad = ({ filterDataVehicle }: { filterDataVehicle: IVehicle }) => {
     lat: filterDataVehicle.latitude,
     lon: filterDataVehicle.longitude,
   });
-
-  return (
-    <div className="border border-gray-300 p-1 flex flex-col gap-[2px]">
-      <div className="text-[13px]">
-        <span className="font-bold">Biển số: </span>
-        {filterDataVehicle?.vehicle_name}
-      </div>
-      <div className="text-[13px]">
-        <span className="font-bold">Tên hiển thị: </span>
-        {filterDataVehicle?.vehicle_name}
-      </div>
-      <div className="text-[13px]">
-        <span className="font-bold">IMEI: </span>
-        {filterDataVehicle?.imei}
-      </div>
-      <div className="text-[13px] flex gap-1 items-center">
-        <span className="font-bold flex-shrink-0">Loại PT: </span>
+  const vehicleInfo = [
+    { label: "Biển số:", value: filterDataVehicle?.vehicle_name },
+    { label: "Tên hiển thị:", value: filterDataVehicle?.vehicle_name },
+    { label: "IMEI:", value: filterDataVehicle?.imei },
+    {
+      label: "Loại PT:",
+      value: (
         <Text
           ellipsis={{
             tooltip: filterDataVehicle?.vehicle_type_name,
@@ -33,22 +23,17 @@ const DetailRoad = ({ filterDataVehicle }: { filterDataVehicle: IVehicle }) => {
         >
           {filterDataVehicle?.vehicle_type_name}
         </Text>
-      </div>
-
-      <div className="text-[13px]">
-        <span className="font-bold">Tốc độ: </span>
-        {filterDataVehicle?.speed} km/h
-      </div>
-      <div className="text-[13px]">
-        <span className="font-bold">Tốc độ giới hạn: </span>
-        {filterDataVehicle?.max_speed} km/h
-      </div>
-      <div className="text-[13px]">
-        <span className="font-bold">Địa chỉ: </span>
-        {address?.display_name ? address?.display_name : ""}
-      </div>
-      <div className="text-[13px] flex gap-1 items-center">
-        <span className="font-bold">Toạ độ: </span>
+      ),
+    },
+    { label: "Tốc độ:", value: `${filterDataVehicle?.speed} km/h` },
+    {
+      label: "Tốc độ giới hạn:",
+      value: `${filterDataVehicle?.max_speed} km/h`,
+    },
+    { label: "Địa chỉ:", value: address?.display_name || "" },
+    {
+      label: "Toạ độ:",
+      value: (
         <Text copyable underline>
           <Link
             to={`https://www.google.com/maps/search/?api=1&query=${filterDataVehicle?.latitude},${filterDataVehicle?.longitude}`}
@@ -59,14 +44,25 @@ const DetailRoad = ({ filterDataVehicle }: { filterDataVehicle: IVehicle }) => {
             {filterDataVehicle?.latitude},{filterDataVehicle?.longitude}
           </Link>
         </Text>
-      </div>
-      <div className="text-[13px]">
-        <span className="font-bold">KM/ngày: </span>
-        {filterDataVehicle?.distance
-          ? (filterDataVehicle?.distance / 1000).toFixed(2)
-          : "0"}{" "}
-        km
-      </div>
+      ),
+    },
+    {
+      label: "KM/ngày:",
+      value: `${
+        filterDataVehicle?.distance
+          ? (filterDataVehicle.distance / 1000).toFixed(2)
+          : "0"
+      } km`,
+    },
+  ];
+
+  return (
+    <div className="border border-gray-300 p-1 flex flex-col gap-[2px]">
+      {vehicleInfo.map(({ label, value }, index) => (
+        <div className="text-[13px] flex gap-1" key={index}>
+          <span className="font-bold flex-shrink-0">{label}</span> {value}
+        </div>
+      ))}
     </div>
   );
 };
