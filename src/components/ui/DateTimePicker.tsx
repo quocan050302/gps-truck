@@ -27,13 +27,17 @@ const DateTimePicker = ({ onDateRangeChange }: DateTimePickerProps) => {
     }
   };
 
-  const handleChange = (dates: [Dayjs | null, Dayjs | null]) => {
-    setSelectedDates(dates);
-    if (dates && dates[0] && dates[1]) {
-      const startDate = dates[0].unix();
-      const endDate = dates[1].unix();
-
-      onDateRangeChange({ startDate, endDate });
+  const handleChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
+    if (dates) {
+      setSelectedDates(dates);
+      if (dates[0] && dates[1]) {
+        const startDate = dates[0].unix();
+        const endDate = dates[1].unix();
+        onDateRangeChange({ startDate, endDate });
+      }
+    } else {
+      setSelectedDates([null, null]);
+      onDateRangeChange({ startDate: null, endDate: null });
     }
   };
 
