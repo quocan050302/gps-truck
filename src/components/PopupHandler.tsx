@@ -59,11 +59,7 @@ const PopupHandler = memo(({ popupInfo, positionRoute }: PopupProp) => {
   return (
     <>
       {popupPosition && popupContent && (
-        <Popup
-          position={popupPosition}
-          closeButton={true}
-          //   onClose={() => setPopupContent(null)}
-        >
+        <Popup position={popupPosition} closeButton={true}>
           <span>{popupContent}</span>
         </Popup>
       )}
